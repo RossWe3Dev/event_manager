@@ -74,6 +74,7 @@ contents.each do |row|
 
   hour = Time.strptime(date_and_time, "%D %R").strftime("%R")
 
-  # save_thank_you_letter(id, form_letter)
-  puts "#{name} #{phone_number} on a #{week_day} at #{hour}"
+  save_thank_you_letter(id, form_letter)
+
+  puts "#{name} #{phone_number} Registered on a #{week_day} at #{hour}"
 end
