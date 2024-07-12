@@ -21,6 +21,17 @@ def legislators_by_zipcode(zip)
   end
 end
 
+def save_thank_you_letter(id, form_letter)
+  Dir.mkdir("output") unless Dir.exist?("output")
+
+  filename = "output/thanks_#{id}.html"
+
+  # open file with the 'w' tag for writing
+  File.open(filename, "w") do |file|
+    file.puts form_letter
+  end
+end
+
 puts "Event Manager Initialized!"
 
 # using CSV parser from Ruby's library
@@ -36,24 +47,11 @@ erb_template = ERB.new template_letter
 
 contents.each do |row|
   id = row[0] # assign id for file names using first column from .csv, using index value since no available symbol
-
   name = row[:first_name] # first variable read by erb template
-
   zipcode = clean_zipcode(row[:zipcode])
-
   legislators = legislators_by_zipcode(zipcode) # second variable read by erb template
 
   form_letter = erb_template.result(binding) # the code is directly set in the ERB escape tags
 
-  # puts form_letter # no longer outputting to the CLI
-
-  # create output folder and files with id in the file names
-  Dir.mkdir("output") unless Dir.exist?("output")
-
-  filename = "output/thanks_#{id}.html"
-
-  # open file with the 'w' tag for writing
-  File.open(filename, "w") do |file|
-    file.puts form_letter
-  end
+  save_thank_you_letter(id, form_letter)
 end
