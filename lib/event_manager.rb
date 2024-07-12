@@ -66,12 +66,29 @@ contents = CSV.open(
   header_converters: :symbol
 )
 
+# CLI output parser
+# contents.each do |row|
+#   name = row[:first_name]
+
+#   zipcode = clean_zipcode(row[:zipcode])
+
+#   legislator_string = legislators_by_zipcode(zipcode) # moved the code block into its own method
+
+#   puts "#{name} #{zipcode} #{legislator_string}"
+# end
+
+# load letter template
+template_letter = File.read("form_letter.html")
+
 contents.each do |row|
   name = row[:first_name]
 
   zipcode = clean_zipcode(row[:zipcode])
 
-  legislator_string = legislators_by_zipcode(zipcode) # moved the code block into its own method
+  legislators = legislators_by_zipcode(zipcode)
 
-  puts "#{name} #{zipcode} #{legislator_string}"
+  personal_letter = template_letter.gsub("FIRST_NAME", name)
+  personal_letter.gsub!("LEGISLATORS", legislators)
+
+  puts personal_letter
 end
