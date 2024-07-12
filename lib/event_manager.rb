@@ -1,11 +1,11 @@
 require "csv"
 require "google/apis/civicinfo_v2"
 
-civic_info = Google::Apis::CivicinfoV2::CivicInfoService.new
-civic_info.key = File.read("secret.key").strip
-
 # separate the logic for a clean code
 def clean_zipcode(zipcode)
+  # succint one-liner, all called methods apply only if the argument needs modifications
+  zipcode.to_s.rjust(5, "0")[0..4]
+
   # if zipcode.nil?
   #   "00000"
   # elsif zipcode.length < 5
@@ -15,9 +15,31 @@ def clean_zipcode(zipcode)
   # else
   #   zipcode
   # end
+end
 
-  # succint one-liner, all called methods apply only if the argument needs modifications
-  zipcode.to_s.rjust(5, "0")[0..4]
+def legislators_by_zipcode(zip)
+  civic_info = Google::Apis::CivicinfoV2::CivicInfoService.new
+  civic_info.key = File.read("secret.key").strip
+
+  begin
+    legislators = civic_info.representative_info_by_address(
+      address: zip,
+      levels: "country",
+      roles: %w[legislatorUpperBody legislatorLowerBody]
+    )
+    legislators = legislators.officials
+
+    # legislator_names = legislators.map do |legislator|
+    #   legislator.name
+    # end
+
+    # or the cleaner one liner
+    legislator_names = legislators.map(&:name)
+
+    legislator_names.join(", ")
+  rescue
+    "You can find your representatives by visiting www.commoncause.org/take-action/find-elected-officials"
+  end
 end
 
 puts "Event Manager Initialized!"
@@ -49,25 +71,7 @@ contents.each do |row|
 
   zipcode = clean_zipcode(row[:zipcode])
 
-  begin
-    legislators = civic_info.representative_info_by_address(
-      address: zipcode,
-      levels: "country",
-      roles: %w[legislatorUpperBody legislatorLowerBody]
-    )
-    legislators = legislators.officials
-
-    # legislator_names = legislators.map do |legislator|
-    #   legislator.name
-    # end
-
-    # or the cleaner one liner
-    legislator_names = legislators.map(&:name)
-
-    legislator_string = legislator_names.join(", ")
-  rescue
-    "You can find your representatives by visiting www.commoncause.org/take-action/find-elected-officials"
-  end
+  legislator_string = legislators_by_zipcode(zipcode) # moved the code block into its own method
 
   puts "#{name} #{zipcode} #{legislator_string}"
 end
