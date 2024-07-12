@@ -56,9 +56,18 @@ contents.each do |row|
       roles: %w[legislatorUpperBody legislatorLowerBody]
     )
     legislators = legislators.officials
+
+    # legislator_names = legislators.map do |legislator|
+    #   legislator.name
+    # end
+
+    # or the cleaner one liner
+    legislator_names = legislators.map(&:name)
+
+    legislator_string = legislator_names.join(", ")
   rescue
     "You can find your representatives by visiting www.commoncause.org/take-action/find-elected-officials"
   end
 
-  puts "#{name} #{zipcode} #{legislators}"
+  puts "#{name} #{zipcode} #{legislator_string}"
 end
