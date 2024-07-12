@@ -1,6 +1,8 @@
 require "csv"
 require "google/apis/civicinfo_v2"
 require "erb" # load ERB library
+require "time"
+require "date"
 
 def clean_zipcode(zipcode)
   zipcode.to_s.rjust(5, "0")[0..4]
@@ -32,6 +34,17 @@ def save_thank_you_letter(id, form_letter)
   end
 end
 
+def clean_phone_number(phone_num)
+  numbers_only = phone_num.to_s.delete("^0-9")
+  if numbers_only.length == 10
+    numbers_only.insert(3, "-").insert(-5, "-")
+  elsif numbers_only[0] == "1" && numbers_only.length == 11
+    numbers_only[1..10].insert(3, "-").insert(-5, "-")
+  else
+    "Invalid number"
+  end
+end
+
 puts "Event Manager Initialized!"
 
 # using CSV parser from Ruby's library
@@ -53,5 +66,14 @@ contents.each do |row|
 
   form_letter = erb_template.result(binding) # the code is directly set in the ERB escape tags
 
-  save_thank_you_letter(id, form_letter)
+  phone_number = clean_phone_number(row[:homephone])
+
+  date_and_time = row[:regdate]
+
+  week_day = Date.strptime(date_and_time, "%D").strftime("%A")
+
+  hour = Time.strptime(date_and_time, "%D %R").strftime("%R")
+
+  # save_thank_you_letter(id, form_letter)
+  puts "#{name} #{phone_number} on a #{week_day} at #{hour}"
 end
