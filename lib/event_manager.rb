@@ -71,7 +71,7 @@ hours = []
 
 contents.each do |row|
   # id = row[0]
-  # name = row[:first_name]
+  name = row[:first_name]
   # zipcode = clean_zipcode(row[:zipcode])
   # legislators = legislators_by_zipcode(zipcode)
 
@@ -90,6 +90,7 @@ contents.each do |row|
   hours.push(hour)
 
   puts "#{name} #{phone_number} Registered on a #{week_day} at #{hour}"
+  sleep(0.2)
 end
 
 puts "\nUsers registered at:"
