@@ -63,19 +63,19 @@ contents = CSV.open(
 )
 
 # create ERB template from the contents of the template (.erb) file
-template_letter = File.read("form_letter.erb")
-erb_template = ERB.new template_letter
+# template_letter = File.read("form_letter.erb")
+# erb_template = ERB.new template_letter
 
 week_days = []
 hours = []
 
 contents.each do |row|
-  id = row[0] # assign id for file names using first column from .csv, using index value since no available symbol
-  name = row[:first_name]
-  zipcode = clean_zipcode(row[:zipcode])
-  legislators = legislators_by_zipcode(zipcode)
+  # id = row[0]
+  # name = row[:first_name]
+  # zipcode = clean_zipcode(row[:zipcode])
+  # legislators = legislators_by_zipcode(zipcode)
 
-  form_letter = erb_template.result(binding) # the code set in the ERB escape tags
+  # form_letter = erb_template.result(binding)
 
   # save_thank_you_letter(id, form_letter)
 
