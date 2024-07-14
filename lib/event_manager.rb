@@ -1,8 +1,6 @@
 require "csv"
 require "google/apis/civicinfo_v2"
 require "erb" # load ERB library
-require "time"
-require "date"
 
 def clean_zipcode(zipcode)
   zipcode.to_s.rjust(5, "0")[0..4]
@@ -45,6 +43,14 @@ def clean_phone_number(phone_num)
   end
 end
 
+def ads_info_count(array)
+  info_hash = array.reduce(Hash.new(0)) do |hash, key|
+    hash[key] += 1
+    hash
+  end
+  info_hash.sort_by { |_k, v| v }.reverse.to_h
+end
+
 puts "Event Manager Initialized!"
 
 # using CSV parser from Ruby's library
@@ -58,23 +64,31 @@ contents = CSV.open(
 template_letter = File.read("form_letter.erb")
 erb_template = ERB.new template_letter
 
+week_days = []
+hours = []
+
 contents.each do |row|
   id = row[0] # assign id for file names using first column from .csv, using index value since no available symbol
-  name = row[:first_name] # first variable read by erb template
+  name = row[:first_name]
   zipcode = clean_zipcode(row[:zipcode])
-  legislators = legislators_by_zipcode(zipcode) # second variable read by erb template
+  legislators = legislators_by_zipcode(zipcode)
 
-  form_letter = erb_template.result(binding) # the code is directly set in the ERB escape tags
+  form_letter = erb_template.result(binding) # the code set in the ERB escape tags
+
+  # save_thank_you_letter(id, form_letter)
 
   phone_number = clean_phone_number(row[:homephone])
 
-  date_and_time = row[:regdate]
+  date_and_time = DateTime.strptime(row[:regdate], "%D %R")
 
-  week_day = Date.strptime(date_and_time, "%D").strftime("%A")
+  week_day = date_and_time.strftime("%A")
+  week_days.push(week_day)
 
-  hour = Time.strptime(date_and_time, "%D %R").strftime("%R")
-
-  save_thank_you_letter(id, form_letter)
+  hour = date_and_time.strftime("%H:00")
+  hours.push(hour)
 
   puts "#{name} #{phone_number} Registered on a #{week_day} at #{hour}"
 end
+
+puts "\nHours and relative count of user registration:\n#{ads_info_count(hours)}"
+puts "\nWeek days and relative count of user registration:\n#{ads_info_count(week_days)}"
