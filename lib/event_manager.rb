@@ -44,11 +44,13 @@ def clean_phone_number(phone_num)
 end
 
 def ads_info_count(array)
-  info_hash = array.reduce(Hash.new(0)) do |hash, key|
-    hash[key] += 1
-    hash
+  array.reduce(Hash.new(0)) { |h, k| h[k] += 1; h }.sort_by { |_k, v| v }.reverse.to_h
+end
+
+def display_info(hash)
+  hash.each do |k, v|
+    v == 1 ? (puts "#{k}, #{v} time") : (puts "#{k}, #{v} times")
   end
-  info_hash.sort_by { |_k, v| v }.reverse.to_h
 end
 
 puts "Event Manager Initialized!"
@@ -90,5 +92,8 @@ contents.each do |row|
   puts "#{name} #{phone_number} Registered on a #{week_day} at #{hour}"
 end
 
-puts "\nHours and relative count of user registration:\n#{ads_info_count(hours)}"
-puts "\nWeek days and relative count of user registration:\n#{ads_info_count(week_days)}"
+puts "\nUsers registered at:"
+display_info(ads_info_count(hours))
+
+puts "\nUsers registered on a:"
+display_info(ads_info_count(week_days))
